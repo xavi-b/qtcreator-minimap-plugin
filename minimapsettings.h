@@ -51,5 +51,7 @@ public:
     }
 };
 
+MinimapSettings &globalMinimapSettings();
+
 void setupMinimapSettings(ExtensionSystem::IPlugin &plugin);
 } // namespace Minimap::Internal

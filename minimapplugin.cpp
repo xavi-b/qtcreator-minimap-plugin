@@ -6,6 +6,7 @@
 
 #include <coreplugin/icore.h>
 #include <coreplugin/editormanager/editormanager.h>
+#include <texteditor/texteditor.h>
 
 #include "minimapsettings.h"
 #include "minimapstyle.h"
@@ -19,8 +20,6 @@ class MinimapPlugin final : public ExtensionSystem::IPlugin
 
     void initialize() final
     {
-        qApp->setStyle(new MinimapStyle(qApp->style()));
-
         connect(Core::EditorManager::instance(), &Core::EditorManager::editorCreated, this, [=](Core::IEditor *editor, const Utils::FilePath &filePath){
             Q_UNUSED(filePath);
             TextEditor::BaseTextEditor* baseEditor = qobject_cast<TextEditor::BaseTextEditor*>(editor);

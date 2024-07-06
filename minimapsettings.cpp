@@ -31,7 +31,7 @@ const char lineCountThresholdKey[] = "LineCountThresHold";
 const char alphaKey[] = "Alpha";
 } // namespace
 
-MinimapSettings &settings()
+MinimapSettings &globalMinimapSettings()
 {
     static MinimapSettings theMinimapSettings;
     return theMinimapSettings;
@@ -78,18 +78,19 @@ public:
             &TextEditor::TextEditorSettings::displaySettingsChanged,
             this,
             &MinimapSettingsPageWidget::displaySettingsChanged);
-        connect(&settings(), &MinimapSettings::changed,
+        connect(&globalMinimapSettings(), &MinimapSettings::changed,
                 this, &MinimapSettingsPageWidget::updateUi);
         m_textWrapping = TextEditor::TextEditorSettings::displaySettings().m_textWrapping;
     }
 
     void apply()
     {
-        settings().m_enabled = m_enabled->isChecked();
-        settings().m_width = m_width->value();
-        settings().m_lineCountThreshold = m_lineCountThresHold->value();
-        settings().m_alpha = m_alpha->value();
-        settings().toSettings(Core::ICore::settings());
+        globalMinimapSettings().m_enabled = m_enabled->isChecked();
+        globalMinimapSettings().m_width = m_width->value();
+        globalMinimapSettings().m_lineCountThreshold = m_lineCountThresHold->value();
+        globalMinimapSettings().m_alpha = m_alpha->value();
+        globalMinimapSettings().toSettings(Core::ICore::settings());
+        emit globalMinimapSettings().changed();
     }
 
 private:
@@ -104,10 +105,10 @@ private:
 
     void updateUi()
     {
-        m_enabled->setChecked(settings().m_enabled);
-        m_width->setValue(settings().m_width);
-        m_lineCountThresHold->setValue(settings().m_lineCountThreshold);
-        m_alpha->setValue(settings().m_alpha);
+        m_enabled->setChecked(globalMinimapSettings().m_enabled);
+        m_width->setValue(globalMinimapSettings().m_width);
+        m_lineCountThresHold->setValue(globalMinimapSettings().m_lineCountThreshold);
+        m_alpha->setValue(globalMinimapSettings().m_alpha);
     }
 
     QCheckBox *m_enabled;
@@ -168,7 +169,7 @@ void setupMinimapSettings(ExtensionSystem::IPlugin &plugin)
 {
     static MinimapSettingsPage theMinimapSettingsPage;
 
-    settings().fromSettings(Core::ICore::settings());
+    globalMinimapSettings().fromSettings(Core::ICore::settings());
 }
 
 } // namespace Internal
