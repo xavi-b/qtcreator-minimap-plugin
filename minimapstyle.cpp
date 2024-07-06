@@ -95,7 +95,7 @@ public:
         , m_editor(editor->editorWidget())
         , m_update(false)
     {
-        m_editor->setStyle(new MinimapStyle(m_editor->style()));
+        qApp->setStyle(new MinimapStyle(qApp->style())); // TODO why qApp ?
 
         m_editor->installEventFilter(this);
         if (!m_editor->textDocument()->document()->isEmpty()) {
