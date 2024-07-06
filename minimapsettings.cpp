@@ -9,6 +9,7 @@
 #include <extensionsystem/pluginmanager.h>
 #include <texteditor/displaysettings.h>
 #include <texteditor/texteditorsettings.h>
+#include <texteditor/texteditorconstants.h>
 #include <utils/qtcassert.h>
 
 #include <QCheckBox>
@@ -25,10 +26,10 @@ namespace Minimap {
 namespace Internal {
 namespace {
 const char minimapPostFix[] = "Minimap";
-const char enabledKey[] = "Enabled";
-const char widthKey[] = "Width";
-const char lineCountThresholdKey[] = "LineCountThresHold";
-const char alphaKey[] = "Alpha";
+const char enabledKey[] = "Minimap.Enabled";
+const char widthKey[] = "Minimap.Width";
+const char lineCountThresholdKey[] = "Minimap.LineCountThresHold";
+const char alphaKey[] = "Minimap.Alpha";
 } // namespace
 
 MinimapSettings &globalMinimapSettings()
@@ -42,45 +43,46 @@ class MinimapSettingsPageWidget : public Core::IOptionsPageWidget
 public:
     MinimapSettingsPageWidget()
     {
-        QVBoxLayout *layout = new QVBoxLayout;
-        QGroupBox *groupBox = new QGroupBox(this);
-        groupBox->setTitle(Tr::tr("Minimap"));
-        layout->addWidget(groupBox);
+        globalMinimapSettings().fromSettings(Core::ICore::settings());
+
         QFormLayout *form = new QFormLayout;
-        m_enabled = new QCheckBox(groupBox);
+
+        m_enabled = new QCheckBox();
         m_enabled->setToolTip(Tr::tr("Check to enable Minimap scrollbar"));
         form->addRow(Tr::tr("Enabled:"), m_enabled);
+
         m_width = new QSpinBox;
         m_width->setMinimum(1);
         m_width->setMaximum(std::numeric_limits<int>::max());
         m_width->setToolTip(Tr::tr("The width of the Minimap"));
         form->addRow(Tr::tr("Width:"), m_width);
+
         m_lineCountThresHold = new QSpinBox;
         m_lineCountThresHold->setMinimum(1);
         m_lineCountThresHold->setMaximum(std::numeric_limits<int>::max());
         m_lineCountThresHold->setToolTip(
             Tr::tr("Line count threshold where no Minimap scrollbar is to be used"));
         form->addRow(Tr::tr("Line Count Threshold:"), m_lineCountThresHold);
+
         m_alpha = new QSpinBox;
         m_alpha->setMinimum(0);
         m_alpha->setMaximum(255);
         m_alpha->setToolTip(Tr::tr("The alpha value of the scrollbar slider"));
         form->addRow(Tr::tr("Scrollbar slider alpha value:"), m_alpha);
-        groupBox->setLayout(form);
-        setLayout(layout);
-        setEnabled(!m_textWrapping);
-        setToolTip(
-            m_textWrapping ? Tr::tr("Disable text wrapping to enable Minimap scrollbar")
-                           : QString());
+
+        setLayout(form);
 
         connect(
             TextEditor::TextEditorSettings::instance(),
             &TextEditor::TextEditorSettings::displaySettingsChanged,
             this,
-            &MinimapSettingsPageWidget::displaySettingsChanged);
+            &MinimapSettingsPageWidget::updateUi);
         connect(&globalMinimapSettings(), &MinimapSettings::changed,
                 this, &MinimapSettingsPageWidget::updateUi);
-        m_textWrapping = TextEditor::TextEditorSettings::displaySettings().m_textWrapping;
+        connect(m_enabled, &QCheckBox::stateChanged, this, &MinimapSettingsPageWidget::updateEnabled);
+
+        updateUi();
+        updateEnabled();
     }
 
     void apply()
@@ -94,21 +96,25 @@ public:
     }
 
 private:
-    void displaySettingsChanged(const TextEditor::DisplaySettings &settings)
+    void updateUi()
     {
-        m_textWrapping = settings.m_textWrapping;
+        m_textWrapping = TextEditor::TextEditorSettings::displaySettings().m_textWrapping;
         setEnabled(!m_textWrapping);
         setToolTip(
             m_textWrapping ? Tr::tr("Disable text wrapping to enable Minimap scrollbar")
                            : QString());
-    }
 
-    void updateUi()
-    {
         m_enabled->setChecked(globalMinimapSettings().m_enabled);
         m_width->setValue(globalMinimapSettings().m_width);
         m_lineCountThresHold->setValue(globalMinimapSettings().m_lineCountThreshold);
         m_alpha->setValue(globalMinimapSettings().m_alpha);
+    }
+
+    void updateEnabled()
+    {
+        m_width->setEnabled(m_enabled->isChecked());
+        m_lineCountThresHold->setEnabled(m_enabled->isChecked());
+        m_alpha->setEnabled(m_enabled->isChecked());
     }
 
     QCheckBox *m_enabled;
@@ -126,6 +132,7 @@ public:
     {
         setId(Constants::MINIMAP_SETTINGS);
         setDisplayName(Tr::tr("Minimap"));
+        setCategory(TextEditor::Constants::TEXT_EDITOR_SETTINGS_CATEGORY);
         setWidgetCreator([] { return new MinimapSettingsPageWidget(); });
     }
 

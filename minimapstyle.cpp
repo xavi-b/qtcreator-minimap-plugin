@@ -177,16 +177,6 @@ private:
             &globalMinimapSettings(),
             &MinimapSettings::changed,
             this,
-            &MinimapStyleObject::deferedUpdate);
-        connect(
-            &globalMinimapSettings(),
-            &MinimapSettings::changed,
-            this,
-            &MinimapStyleObject::deferedUpdate);
-        connect(
-            &globalMinimapSettings(),
-            &MinimapSettings::changed,
-            this,
             &MinimapStyleObject::fontSettingsChanged);
         connect(
             scrollbar,
