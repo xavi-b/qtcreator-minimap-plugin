@@ -3,7 +3,8 @@ add_qtc_plugin(Minimap
   SOURCES
     minimap_global.h
     minimapconstants.h
-    minimap.cpp minimap.h
+    minimaptr.h
+    minimapplugin.cpp
     minimapstyle.cpp minimapstyle.h
     minimapsettings.cpp minimapsettings.h
 )

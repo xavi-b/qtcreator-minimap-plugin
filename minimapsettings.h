@@ -1,69 +1,55 @@
-/*
-  Minimap QtCreator plugin.
-
-  This library is free software; you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation; either version 2.1 of the
-  License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not see
-  http://www.gnu.org/licenses/lgpl-2.1.html.
-
-  Copyright (c) 2017, emJay Software Consulting AB, See AUTHORS for details.
-*/
+// Copyright (C) 2017, emJay Software Consulting AB
+// Copyright (C) 2024, Xavier BESSON
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-2.1-only WITH Qt-GPL-exception-1.0
 
 #pragma once
 
+#include "minimapconstants.h"
+
 #include <QObject>
 
-namespace Minimap
-{
-namespace Internal
-{
+namespace Utils {
+class QtcSettings;
+}
+namespace ExtensionSystem {
+class IPlugin;
+}
+
+namespace Minimap::Internal {
 class MinimapSettingsPage;
+class MinimapSettingsPageWidget;
 
 class MinimapSettings : public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
+
 public:
-   explicit MinimapSettings(QObject* parent);
-   ~MinimapSettings();
+    explicit MinimapSettings();
+    ~MinimapSettings();
 
-   void toMap(const QString& prefix, QVariantMap* map) const;
-   void fromMap(const QString& prefix, const QVariantMap& map);
+    bool equals(const MinimapSettings &other) const;
 
-   static MinimapSettings* instance();
+    void toSettings(Utils::QtcSettings *s) const;
+    void fromSettings(Utils::QtcSettings *s);
 
-   static bool enabled();
-   static int width();
-   static int lineCountThreshold();
-   static int alpha();
+    bool m_enabled = false;
+    int m_width = Constants::MINIMAP_WIDTH_DEFAULT;
+    int m_lineCountThreshold = Constants::MINIMAP_MAX_LINE_COUNT_DEFAULT;
+    int m_alpha = Constants::MINIMAP_ALPHA_DEFAULT;
 
 signals:
-   void enabledChanged(bool);
-   void widthChanged(int);
-   void lineCountThresholdChanged(int);
-   void alphaChanged(int);
+    void changed();
 
-private:
-   friend class MinimapSettingsPage;
-
-   void setEnabled(bool enabled);
-   void setWidth(int width);
-   void setLineCountThreshold(int lineCountThreshold);
-   void setAlpha(int alpha);
-
-   bool m_enabled;
-   int m_width;
-   int m_lineCountThreshold;
-   int m_alpha;
-   MinimapSettingsPage* m_settingsPage;
+public:
+    friend bool operator==(const MinimapSettings &p1, const MinimapSettings &p2)
+    {
+        return p1.equals(p2);
+    }
+    friend bool operator!=(const MinimapSettings &p1, const MinimapSettings &p2)
+    {
+        return !p1.equals(p2);
+    }
 };
-}
-}
+
+void setupMinimapSettings(ExtensionSystem::IPlugin &plugin);
+} // namespace Minimap::Internal
