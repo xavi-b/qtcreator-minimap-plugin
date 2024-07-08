@@ -8,8 +8,8 @@
 #include <coreplugin/icore.h>
 #include <extensionsystem/pluginmanager.h>
 #include <texteditor/displaysettings.h>
-#include <texteditor/texteditorsettings.h>
 #include <texteditor/texteditorconstants.h>
+#include <texteditor/texteditorsettings.h>
 #include <utils/qtcassert.h>
 
 #include <QCheckBox>
@@ -77,8 +77,11 @@ public:
             &TextEditor::TextEditorSettings::displaySettingsChanged,
             this,
             &MinimapSettingsPageWidget::updateUi);
-        connect(&globalMinimapSettings(), &MinimapSettings::changed,
-                this, &MinimapSettingsPageWidget::updateUi);
+        connect(
+            &globalMinimapSettings(),
+            &MinimapSettings::changed,
+            this,
+            &MinimapSettingsPageWidget::updateUi);
         connect(m_enabled, &QCheckBox::stateChanged, this, &MinimapSettingsPageWidget::updateEnabled);
 
         updateUi();

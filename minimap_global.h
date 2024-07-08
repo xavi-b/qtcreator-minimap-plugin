@@ -7,9 +7,9 @@
 #include <qglobal.h>
 
 #if defined(MINIMAP_LIBRARY)
-#  define MINIMAP_EXPORT Q_DECL_EXPORT
+#define MINIMAP_EXPORT Q_DECL_EXPORT
 #elif defined(MINIMAP_STATIC_LIBRARY)
-#  define MINIMAP_EXPORT
+#define MINIMAP_EXPORT
 #else
-#  define MINIMAP_EXPORT Q_DECL_IMPORT
+#define MINIMAP_EXPORT Q_DECL_IMPORT
 #endif

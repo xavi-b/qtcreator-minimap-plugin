@@ -4,8 +4,8 @@
 
 #include <extensionsystem/iplugin.h>
 
-#include <coreplugin/icore.h>
 #include <coreplugin/editormanager/editormanager.h>
+#include <coreplugin/icore.h>
 #include <texteditor/texteditor.h>
 
 #include "minimapsettings.h"
@@ -20,21 +20,23 @@ class MinimapPlugin final : public ExtensionSystem::IPlugin
 
     void initialize() final
     {
-        connect(Core::EditorManager::instance(), &Core::EditorManager::editorCreated, this, [=](Core::IEditor *editor, const Utils::FilePath &filePath){
-            Q_UNUSED(filePath);
-            TextEditor::BaseTextEditor* baseEditor = qobject_cast<TextEditor::BaseTextEditor*>(editor);
-            if (baseEditor) {
-                MinimapStyle::createMinimapStyleObject(baseEditor);
-            }
-        });
+        connect(
+            Core::EditorManager::instance(),
+            &Core::EditorManager::editorCreated,
+            this,
+            [=](Core::IEditor *editor, const Utils::FilePath &filePath) {
+                Q_UNUSED(filePath);
+                TextEditor::BaseTextEditor *baseEditor = qobject_cast<TextEditor::BaseTextEditor *>(
+                    editor);
+                if (baseEditor) {
+                    MinimapStyle::createMinimapStyleObject(baseEditor);
+                }
+            });
     }
 
-    void extensionsInitialized()
-    {
-        setupMinimapSettings(*this);
-    }
+    void extensionsInitialized() { setupMinimapSettings(*this); }
 };
 
-} // Minimap::Internal
+} // namespace Minimap::Internal
 
 #include "minimapplugin.moc"
